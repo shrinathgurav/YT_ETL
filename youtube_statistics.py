@@ -2,6 +2,7 @@ import requests
 import json
 import os
 from dotenv import load_dotenv
+from datetime import date,datetime
 
 load_dotenv(".env")
 API_KEY=os.getenv("API_KEY")
@@ -91,11 +92,15 @@ def extract_video_data(video_ids) :
         return extracted_data               
     except requests.exceptions.RequestException as reqErr:
         raise reqErr
+    
+def save_json_data(extracted_data):
+    file_path=f"./data/youtube_data_{date.today().strftime("%d_%m%Y")}_{datetime.now().strftime("%H%M%S")}.json"
+    
+    with open(file_path,"w",encoding="utf-8") as json_writer:
+        json.dump(extracted_data,json_writer,indent=4,ensure_ascii=False)
         
 
 if __name__=="__main__":
-   channel_playlistId = get_playlist_id()
-   video_ids=get_video_ids(channel_playlistId)
-   extract_video_data(video_ids)
+   save_json_data(extract_video_data(get_video_ids(get_playlist_id())))
    
   
