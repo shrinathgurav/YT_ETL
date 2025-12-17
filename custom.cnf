@@ -1,0 +1,10 @@
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= ""
+local-infile=1
+
+[client]
+socket=/var/run/mysqld/mysqld.sock
+loose-local-infile=1

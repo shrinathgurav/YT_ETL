@@ -1,0 +1,11 @@
+!includedir /etc/mysql/conf.d/
+
+[mysqld]
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+datadir         = /var/lib/mysql
+secure-file-priv= ""
+
+[client]
+socket=/var/run/mysqld/mysqld.sock
+!includedir /etc/mysql/conf.d/
