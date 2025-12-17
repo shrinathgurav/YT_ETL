@@ -1,0 +1,6 @@
+apache-airflow==3.1.5
+requests==2.32.5
+soda-core-postgres==3.5.6
+pytest==9.0.2
+apache-airflow-providers-postgres==6.5.1
+apache-airflow-providers-mysql==6.4.0
