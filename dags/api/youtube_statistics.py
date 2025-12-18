@@ -3,8 +3,8 @@ import json
 
 from datetime import date,datetime
 # from airflow.sdk import task,Variable
-from airflow.models import Variable
-from airflow.sdk import task
+# from airflow.models import Variable
+from airflow.sdk import task,Variable
 
 
 
@@ -103,5 +103,6 @@ def save_json_data(extracted_data):
         json.dump(extracted_data,json_writer,indent=4,ensure_ascii=False)
         
 
-# if __name__=="__main__":
+if __name__=="__main__":
+    print(CHANNEL_HANDLE)
 #    save_json_data(extract_video_data(get_video_ids(get_playlist_id())))

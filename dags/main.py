@@ -16,21 +16,21 @@ defult_args ={
 }
 
 
-# @dag(dag_display_name="YT_DATA_ELT",
-#      default_args=defult_args,
-#      description="Dag to produce json data from youtube API to local file.",
-#      schedule="@daily",
-#      catchup=False)
-# def yt_data_elt():
-#     save_json_data(extract_video_data(get_video_ids(get_playlist_id())))    
+@dag(dag_display_name="YT_DATA_ELT",
+     default_args=defult_args,
+     description="Dag to produce json data from youtube API to local file.",
+     schedule="@daily",
+     catchup=False)
+def yt_data_elt():
+    save_json_data(extract_video_data(get_video_ids(get_playlist_id())))    
     
-# yt_data_elt()    
+yt_data_elt()    
 
-with DAG(dag_display_name="YT_DATA_ELT",
-         dag_id="yt_data_elt",
-         default_args=defult_args,
-         description="Dag to produce json data from youtube API to local file.",
-         schedule="@daily",
-         catchup=False) as dag :
+# with DAG(dag_display_name="YT_DATA_ELT",
+#          dag_id="yt_data_elt",
+#          default_args=defult_args,
+#          description="Dag to produce json data from youtube API to local file.",
+#          schedule="@daily",
+#          catchup=False) as dag :
     
-    save_json_data(extract_video_data(get_video_ids(get_playlist_id()))) 
+#     save_json_data(extract_video_data(get_video_ids(get_playlist_id()))) 
