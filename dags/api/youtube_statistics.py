@@ -97,7 +97,7 @@ def extract_video_data(video_ids) :
         raise reqErr
 @task   
 def save_json_data(extracted_data):
-    file_path=f"./data/youtube_data_{date.today().strftime("%d_%m%Y")}_{datetime.now().strftime("%H%M%S")}.json"
+    file_path=f"./data/YT_data_{date.today()}.json"
     
     with open(file_path,"w",encoding="utf-8") as json_writer:
         json.dump(extracted_data,json_writer,indent=4,ensure_ascii=False)
