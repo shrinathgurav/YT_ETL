@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-stag_table_name="yt_data_stage"
+stag_table_name="yt_data"
 fact_table_name = "yt_data"
 
 @task

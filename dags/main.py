@@ -3,6 +3,7 @@ from datetime import date,datetime, timedelta
 from api.youtube_statistics import get_playlist_id,get_video_ids,extract_video_data,save_json_data
 import pendulum
 
+from dataquality.check_yt_data_quality import yt_etl_data_quality
 from datawarehouse.etl_dwh import  load_core, load_staging
 
 local_tz=pendulum.timezone("Asia/Kolkata")
@@ -17,6 +18,10 @@ defult_args ={
     'retry_delay': timedelta(hours=1),
     'start_date':datetime(year=2025,month=12,day=17,tzinfo=local_tz)
 }
+
+#define schema names
+staging_schema="staging"
+core_schema="core"
 
 
 @dag(dag_display_name="yt_data_etl",
@@ -39,3 +44,16 @@ def yt_data_elt_db():
         load_data_core=load_core()
         load_data_staging >> load_data_core
 yt_data_elt_db() 
+
+@dag(dag_display_name="yt_data_etl_quality",
+     default_args=defult_args,
+     description="Dag to loads data int real tables.",
+     schedule="@daily",
+     catchup=False)
+def yt_data_elt_quality():
+    task_stage_data_quality_check = yt_etl_data_quality(staging_schema)
+    task_core_data_quality_check = yt_etl_data_quality(core_schema)
+    
+    # set task dependencies
+    task_stage_data_quality_check >> task_core_data_quality_check
+yt_data_elt_quality() 
