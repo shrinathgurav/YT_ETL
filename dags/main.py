@@ -1,10 +1,12 @@
 from airflow.sdk import dag
+from airflow.providers.standard.operators.trigger_dagrun import TriggerDagRunOperator
 from datetime import date,datetime, timedelta
+from dataquality.check_yt_data_quality import yt_etl_data_quality
+from datawarehouse.etl_dwh import  load_core, load_staging
 from api.youtube_statistics import get_playlist_id,get_video_ids,extract_video_data,save_json_data
 import pendulum
 
-from dataquality.check_yt_data_quality import yt_etl_data_quality
-from datawarehouse.etl_dwh import  load_core, load_staging
+
 
 local_tz=pendulum.timezone("Asia/Kolkata")
 
@@ -24,36 +26,49 @@ staging_schema="staging"
 core_schema="core"
 
 
-@dag(dag_display_name="yt_data_etl",
+@dag(dag_display_name="produce_data_json",
      default_args=defult_args,
      description="Dag to produce json data from youtube API to local file.",
      schedule="@daily",
      catchup=False)
-def yt_data_elt():
-    save_json_data(extract_video_data(get_video_ids(get_playlist_id())))    
+def produce_data_json():
+    # save_json_data(extract_video_data(get_video_ids(get_playlist_id())))   
+    get_playlistids = get_playlist_id()
+    get_videosids = get_video_ids(get_playlistids)
+    extracted_video_data=extract_video_data(get_videosids)
+    save_json_to_file=save_json_data(extracted_video_data)
+    trigger_update_data_db_dag = TriggerDagRunOperator(task_id="trigger_update_data_db_dag",trigger_dag_id="update_data_db")
     
-yt_data_elt()    
+    get_playlistids >> get_videosids >> extracted_video_data >> save_json_to_file >> trigger_update_data_db_dag
+ 
+    # # save_json_data >> get_playlistids >> get_videosids >> extracted_video_data >> save_json_to_file >> trigger_update_data_db_dag
+    # save_json_data >> trigger_update_data_db_dag
+   
+produce_data_json()    
 
-@dag(dag_display_name="yt_data_etl_database",
+@dag(dag_display_name="update_data_db",
      default_args=defult_args,
      description="Dag to loads data int real tables.",
-     schedule="@daily",
+    #  schedule="@daily",
      catchup=False)
-def yt_data_elt_db():
+def update_data_db():
         load_data_staging = load_staging()
         load_data_core=load_core()
-        load_data_staging >> load_data_core
-yt_data_elt_db() 
+        trigger_check_data_quality = TriggerDagRunOperator(task_id="triger_check_data_quality",trigger_dag_id="check_data_quality")
+        
+        load_data_staging >> load_data_core >> trigger_check_data_quality
+        
+update_data_db() 
 
-@dag(dag_display_name="yt_data_etl_quality",
+@dag(dag_display_name="check_data_quality",
      default_args=defult_args,
      description="Dag to loads data int real tables.",
-     schedule="@daily",
+    #  schedule="@daily",
      catchup=False)
-def yt_data_elt_quality():
+def check_data_quality():
     task_stage_data_quality_check = yt_etl_data_quality(staging_schema)
     task_core_data_quality_check = yt_etl_data_quality(core_schema)
     
     # set task dependencies
     task_stage_data_quality_check >> task_core_data_quality_check
-yt_data_elt_quality() 
+check_data_quality() 

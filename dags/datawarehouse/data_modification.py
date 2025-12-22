@@ -75,7 +75,7 @@ def delete_records(conn,cur,schema,table_name,ids_to_delete) :
         
         cur.execute(f"""
                      delete from {schema}.{table_name}
-                     where "Video_Id" in ({ids_to_delete})
+                     where "Video_Id" in {ids_to_delete}
                     """)        
         conn.commit
         logger.info(f"Deleted rows with the video ids {ids_to_delete}")       
